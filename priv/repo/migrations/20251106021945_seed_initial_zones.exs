@@ -450,10 +450,11 @@ defmodule Shard.Repo.Migrations.SeedInitialZones do
   defp seed_zones_down do
     alias Shard.Repo
     alias Shard.Map.{Zone, Room, Door}
+    import Ecto.Query
 
     IO.puts("Removing seeded zones and their rooms...")
 
-    # Delete zones by slug (this will cascade to rooms and doors)
+    # Delete zones by slug (this will cascade to rooms and doors due to on_delete: :delete_all)
     ["bone-zone", "vampire-castle", "elven-forest"]
     |> Enum.each(fn slug ->
       case Repo.get_by(Zone, slug: slug) do
@@ -465,6 +466,41 @@ defmodule Shard.Repo.Migrations.SeedInitialZones do
           IO.puts("Deleted zone: #{zone.name}")
       end
     end)
+
+    # Reset the rooms sequence to avoid ID conflicts
+    # This ensures PostgreSQL's auto-increment starts after any existing room IDs
+    max_room_id_query = "SELECT COALESCE(MAX(id), 0) FROM rooms"
+
+    case Ecto.Adapters.SQL.query(Repo, max_room_id_query, []) do
+      {:ok, %{rows: [[max_id]]}} ->
+        # Set the sequence to max_id + 1
+        Ecto.Adapters.SQL.query!(
+          Repo,
+          "SELECT setval('rooms_id_seq', $1, false)",
+          [max_id + 1]
+        )
+        IO.puts("Reset rooms ID sequence to #{max_id + 1}")
+
+      _ ->
+        IO.puts("Could not determine max room ID, skipping sequence reset")
+    end
+
+    # Reset the doors sequence to avoid ID conflicts
+    max_door_id_query = "SELECT COALESCE(MAX(id), 0) FROM doors"
+
+    case Ecto.Adapters.SQL.query(Repo, max_door_id_query, []) do
+      {:ok, %{rows: [[max_id]]}} ->
+        # Set the sequence to max_id + 1
+        Ecto.Adapters.SQL.query!(
+          Repo,
+          "SELECT setval('doors_id_seq', $1, false)",
+          [max_id + 1]
+        )
+        IO.puts("Reset doors ID sequence to #{max_id + 1}")
+
+      _ ->
+        IO.puts("Could not determine max door ID, skipping sequence reset")
+    end
 
     IO.puts("✓ Zone system rollback completed!")
   end
