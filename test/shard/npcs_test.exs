@@ -43,5 +43,6 @@ defmodule Shard.NpcsTest do
       zones = Npcs.list_zones()
       assert is_list(zones)
     end
+
   end
 end
