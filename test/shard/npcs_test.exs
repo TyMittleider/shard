@@ -33,5 +33,15 @@ defmodule Shard.NpcsTest do
       rooms = Npcs.list_rooms()
       assert is_list(rooms)
     end
+
+    test "get_npcs_by_zone returns list" do
+      npcs = Npcs.get_npcs_by_zone(1)
+      assert is_list(npcs)
+    end
+
+    test "list_zones returns list" do
+      zones = Npcs.list_zones()
+      assert is_list(zones)
+    end
   end
 end

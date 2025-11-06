@@ -26,7 +26,7 @@ defmodule Shard.Npcs do
   """
   def list_npcs_with_preloads do
     Repo.all(Npc)
-    |> Repo.preload([:room])
+    |> Repo.preload([:room, :zone])
   end
 
   @doc """
@@ -50,7 +50,7 @@ defmodule Shard.Npcs do
   """
   def get_npc_with_preloads!(id) do
     Repo.get!(Npc, id)
-    |> Repo.preload([:room])
+    |> Repo.preload([:room, :zone])
   end
 
   @doc """
@@ -84,6 +84,14 @@ defmodule Shard.Npcs do
   """
   def get_npcs_by_type(npc_type) do
     from(n in Npc, where: n.npc_type == ^npc_type and n.is_active == true)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets NPCs by zone.
+  """
+  def get_npcs_by_zone(zone_id) do
+    from(n in Npc, where: n.zone_id == ^zone_id and n.is_active == true)
     |> Repo.all()
   end
 
@@ -158,6 +166,14 @@ defmodule Shard.Npcs do
   def list_rooms do
     alias Shard.Map.Room
     Repo.all(Room)
+  end
+
+  @doc """
+  Returns the list of zones for NPC assignment.
+  """
+  def list_zones do
+    alias Shard.Map.Zone
+    Repo.all(Zone)
   end
 
   ## Tutorial NPCs

@@ -8,6 +8,7 @@ defmodule Shard.Npcs.Npc do
   import Ecto.Changeset
 
   alias Shard.Map.Room
+  alias Shard.Map.Zone
 
   schema "npcs" do
     field :name, :string
@@ -38,6 +39,7 @@ defmodule Shard.Npcs.Npc do
     field :properties, :map, default: %{}
 
     belongs_to :room, Room
+    belongs_to :zone, Zone
 
     timestamps(type: :utc_datetime)
   end
@@ -66,6 +68,7 @@ defmodule Shard.Npcs.Npc do
       :location_y,
       :location_z,
       :room_id,
+      :zone_id,
       :is_active,
       :respawn_time,
       :last_death_at,

@@ -21,6 +21,7 @@ defmodule Shard.Map.Zone do
     field :display_order, :integer, default: 0
 
     has_many :rooms, Shard.Map.Room
+    has_many :npcs, Shard.Npcs.Npc
 
     timestamps(type: :utc_datetime)
   end
